@@ -164,7 +164,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    intake.flipIntakeDownUp();
+                    intake.flipIntakeMid();
                 }
                 return  false;
             }

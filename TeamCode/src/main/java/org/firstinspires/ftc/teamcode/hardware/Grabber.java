@@ -6,13 +6,13 @@ public class Grabber {
     Servo grabberServo = null;
     Servo grabberFlip = null;
 
-    private static final double GRABBER_OPEN_POS = 0.35;
-    private static final double GRABBER_CLOSE_POS = 0.95;
+    private static final double GRABBER_OPEN_POS = 0.65;
+    private static final double GRABBER_CLOSE_POS = 0;
     private static final double AUTO_GRAB_POS = 0.97;
-    private static final double GRABBER_IN_POS = 0.03;
+    private static final double GRABBER_IN_POS = 0.94;
     private static final double GRABBER_IN_AUTO = 0.02;
-    private static final double GRABBER_OUT_POS = 0.95;
-    private static final double GRABBER_MID_POS = 0.45; //needs to be tested / adjusted was .5
+    private static final double GRABBER_OUT_POS = 0.16;
+    private static final double GRABBER_MID_POS = 0.35;
     private boolean grabberIn;
     private boolean grabberOut;
     private boolean grabberMid;
@@ -64,9 +64,8 @@ public class Grabber {
     }
 
     public void flipGrabberOut() {
-        if (grabberOpen) {
-            closeGrabber();
-        }
+        closeGrabber();
+
         if (!grabberOpen) {
             grabberFlip.setDirection(Servo.Direction.FORWARD);
             //only if linear slide is all the way down
@@ -78,9 +77,8 @@ public class Grabber {
     }
 
     public void flipGrabberIn() {
-        if (grabberOpen) {
-            closeGrabber();
-        }
+        closeGrabber();
+
         if (!grabberOpen) {
             grabberFlip.setDirection(Servo.Direction.FORWARD); //test comment
             grabberFlip.setPosition(GRABBER_IN_POS);

@@ -6,16 +6,15 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private static final double INTAKE_OPEN_POS= 0.8;
-    private static final double INTAKE_CLOSE_POS = 0.4;
-    private static final double INTAKE_UP_POS = 0.25;
-    private static final double INTAKE_DOWN_POS = 0.77;
-    private static final double INTAKE_DOWN_UP = .72;
-    private static final double INTAKE_DOWN_LOWER = 0.8;
+    private static final double INTAKE_OPEN_POS= 0;
+    private static final double INTAKE_CLOSE_POS = 0.14;
+    private static final double INTAKE_UP_POS = .7; //transfer
+    private static final double INTAKE_DOWN_POS = 0.15; //grab block
+    private static final double INTAKE_MID = 0.43; //camera view
     private static final double INTAKE_ROTATE_90_POS = 1.0; //b
     private static final double INTAKE_ROTATE_0_POS = 0.0; //a
-    public static final double EXTENSION_SERVO_OUT_POS = 0;
-    public static final double EXTENSION_SERVO_IN_POS = 0;
+    public static final double EXTENSION_SERVO_OUT_POS = 0.0;
+    public static final double EXTENSION_SERVO_IN_POS = 0.8;
 
     private boolean isRotatedTo0 = true;
     private boolean isIntakeOpen;
@@ -75,13 +74,13 @@ public class Intake {
     }
 
     public void flipIntakeDown() {
-        intakeGrab.close();
+        openIntake();
         intakeFlip.setPosition(INTAKE_DOWN_POS);
         isIntakeUp = false;
     }
 
-    public void flipIntakeDownUp() {
-        intakeFlip.setPosition(INTAKE_DOWN_UP);
+    public void flipIntakeMid() {
+        intakeFlip.setPosition(INTAKE_MID);
         isIntakeUp = false;
     }
 
@@ -91,7 +90,7 @@ public class Intake {
         buttonPressFlip = true;
         if (isIntakeUp) {
             isIntakeUp = false;
-            flipIntakeDownUp();
+            flipIntakeMid();
         }
         else {
             isIntakeUp = true;

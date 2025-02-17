@@ -46,8 +46,8 @@ public class HardwareStore {
 
         liftRight = hardwareMap.get(DcMotorEx.class, "liftRight");
         liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftLimitSwitch = hardwareMap.get(TouchSensor.class, "leftLimitSwitch");
-        rightLimitSwitch = hardwareMap.get(TouchSensor.class, "rightLimitSwitch");
+        leftLimitSwitch = null;//hardwareMap.get(TouchSensor.class, "leftLimitSwitch");
+        rightLimitSwitch = null;//hardwareMap.get(TouchSensor.class, "rightLimitSwitch");
 
         arm = new Arm(liftLeft, liftRight, leftLimitSwitch, rightLimitSwitch);
 
