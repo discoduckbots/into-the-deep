@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 public class Arm {
@@ -27,12 +28,12 @@ public class Arm {
     public Arm(DcMotorEx liftMotor1, DcMotorEx liftMotor2, TouchSensor leftLimitSwitch, TouchSensor rightLimitSwitch) {
 
         this.liftLeft = liftMotor1;
-        this.liftLeft.setDirection(DcMotor.Direction.FORWARD);
+        this.liftLeft.setDirection(DcMotor.Direction.REVERSE);
         this.liftLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.liftLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         this.liftRight = liftMotor2;
-        this.liftRight.setDirection(DcMotor.Direction.REVERSE);
+        this.liftRight.setDirection(DcMotor.Direction.FORWARD);
         this.liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         this.liftRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -49,8 +50,8 @@ public class Arm {
     }
 
     public void lift(double power) {
-        liftLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        liftRight.setDirection(DcMotorEx.Direction.REVERSE);
+        liftLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        liftRight.setDirection(DcMotorEx.Direction.FORWARD);
         liftLeft.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         liftRight.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         liftLeft.setPower(power);
@@ -61,8 +62,8 @@ public class Arm {
 
     public void lower(double power) {
         if (!leftLimitSwitch.isPressed() && !rightLimitSwitch.isPressed()) {
-            liftLeft.setDirection(DcMotorEx.Direction.REVERSE);
-            liftRight.setDirection(DcMotorEx.Direction.FORWARD);
+            liftLeft.setDirection(DcMotorEx.Direction.FORWARD);
+            liftRight.setDirection(DcMotorEx.Direction.REVERSE);
             liftLeft.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
             liftRight.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
             liftLeft.setPower(power);
@@ -82,8 +83,8 @@ public class Arm {
     }
 
     public void liftByEncoder(int position, double power) {
-        liftLeft.setDirection(DcMotorEx.Direction.FORWARD);
-        liftRight.setDirection(DcMotorEx.Direction.REVERSE);
+        liftLeft.setDirection(DcMotorEx.Direction.REVERSE);
+        liftRight.setDirection(DcMotorEx.Direction.FORWARD);
         liftLeft.setTargetPosition(position);
         liftLeft.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         liftRight.setTargetPosition(position);

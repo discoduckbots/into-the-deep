@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.TankDrive;
 
-@Disabled
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="LocalizationTest", group= "Tuning")
 public class LocalizationTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {

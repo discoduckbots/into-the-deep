@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
@@ -15,10 +13,11 @@ public class Intake {
     private static final double INTAKE_ROTATE_0_POS = 0.0; //a
     public static final double EXTENSION_SERVO_OUT_POS = 0.0;
     public static final double EXTENSION_SERVO_IN_POS = 0.8;
+    public static final double EXTENSION_SERVO_MAX_POS = 0.8;
 
     private boolean isRotatedTo0 = true;
     private boolean isIntakeOpen;
-    private boolean isIntakeUp = true;
+    private boolean isIntakeMid = true;
     private boolean buttonPressIntake = false;
     private boolean buttonPressFlip = false;
     private boolean buttonPressRotate = false;
@@ -69,32 +68,34 @@ public class Intake {
         }
         if (isRotatedTo0) {
             intakeFlip.setPosition(INTAKE_UP_POS);
-            isIntakeUp = true;
+            isIntakeMid = false;
         }
     }
 
     public void flipIntakeDown() {
         openIntake();
         intakeFlip.setPosition(INTAKE_DOWN_POS);
-        isIntakeUp = false;
+        isIntakeMid = false;
     }
 
     public void flipIntakeMid() {
         intakeFlip.setPosition(INTAKE_MID);
-        isIntakeUp = false;
+        isIntakeMid = true;
     }
 
     public void onPressFlip() {
 
         if (buttonPressFlip) return;
         buttonPressFlip = true;
-        if (isIntakeUp) {
-            isIntakeUp = false;
-            flipIntakeMid();
+        if (isIntakeMid) {
+            isIntakeMid = false;
+            openIntake();
+            flipIntakeDown();
         }
         else {
-            isIntakeUp = true;
-            flipIntakeUp();
+            isIntakeMid = true;
+            closeIntake();
+            flipIntakeMid();
         }
     }
 
@@ -140,5 +141,9 @@ public class Intake {
 
     public void retract(){
         extensionServo.setPosition(EXTENSION_SERVO_IN_POS);
+    }
+
+    public void extend(double percentage){
+        extensionServo.setPosition(EXTENSION_SERVO_MAX_POS - EXTENSION_SERVO_MAX_POS * Math.abs(percentage));
     }
 }

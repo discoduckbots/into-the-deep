@@ -9,10 +9,12 @@ public class Grabber {
     private static final double GRABBER_OPEN_POS = 0.65;
     private static final double GRABBER_CLOSE_POS = 0;
     private static final double AUTO_GRAB_POS = 0.97;
-    private static final double GRABBER_IN_POS = 0.94;
+    public static final double GRABBER_IN_POS = 0.94;
     private static final double GRABBER_IN_AUTO = 0.02;
-    private static final double GRABBER_OUT_POS = 0.16;
-    private static final double GRABBER_MID_POS = 0.35;
+    public static final double GRABBER_OUT_POS = 0.16;
+    public static final double GRABBER_MID_POS = 0.35;
+    public double[] grabberFlipPos = {GRABBER_IN_POS, GRABBER_MID_POS, GRABBER_OUT_POS};
+
     private boolean grabberIn;
     private boolean grabberOut;
     private boolean grabberMid;
@@ -128,6 +130,14 @@ public class Grabber {
     public void onReleaseFlip() {
         buttonPressFlip = false;
     }
+
+    /*
+    newOnPressFlip() {
+        if (buttonPressFlip) {
+            return;
+        }
+        grabberFlip.setPosition(grabberFlipPos[])
+    } */
 
     public boolean isGrabberIn() {
         return grabberIn;

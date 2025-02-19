@@ -20,7 +20,7 @@ import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.ScoringMechanism;
 
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Fancy Cancelable Teleop", group= "Linear Opmode")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Fancy Cancelable Teleop", group= "Competition Opmodes")
 public class FancyCancelableTeleop extends LinearOpMode {
     enum Mode {
         DRIVER_CONTROL,
@@ -32,25 +32,85 @@ public class FancyCancelableTeleop extends LinearOpMode {
     Intake intake = null;
     Grabber grabber = null;
     TouchSensor leftLimitSwitch = null;
-    ScoringMechanism scoringMechanism = null;
+    TouchSensor rightLimitSwitch = null;
     MecanumDrive drive = null;
 
     private double THROTTLE = 0.7;
     private double TURN_THROTTLE = 0.5;
-    private double LIFT_SPEED = 1.0;
-    private double LOWER_SPEED = 0.7;
+    private double LIFT_SPEED = 0.9;
+    private double LOWER_SPEED = 0.5;
     private double EXTENSION_SPEED = 0.7;
     private boolean inGrabPosition = false;
     boolean minute = false;
     boolean endgame = false;
     boolean tenSec = false;
     boolean rumbling = false;
+    boolean transferInProgress = false;
+    double transferStartTime = 0;
+    double transferElapsedTime;
     private ElapsedTime runtime = new ElapsedTime();
     private Pose2d lastPositionA = null;
     private Pose2d lastPositionB = null;
     boolean lastPositionPressed = false;
     Action moveToLastPosAction = null;
+    String transferState = "0";
 
+    /**
+     * Transfers a sample from the intake to outtake using state and elapsed time instead of sleeping
+     *
+     * Preconditions: You have a sample grabbed in the intake and the intake is at center position
+     * Postconditions: The robot is holding the sample in the outtake flipped backwards
+     *
+     * @// TODO: 2/17/2025 - Need to consider what happens if the outtake/grabber is flipped out when we start
+     * @// TODO: 2/17/2025 - Need to consider if the intake is (partially) extended when we start
+     *
+     * @param elapsedTime - how long the transfer process has taken (seconds)
+     * @return boolean - whether transfer is still in progress
+     */
+    public boolean transfer(double elapsedTime){
+
+        String TS_0_NOT_STARTED = "0";
+
+        String TS_1_1_OPEN_OUTTAKE = "1_1";
+
+        String TS_2_1_INTAKE_UP = "2_1";
+        String TS_2_2_OUTTAKE_GRAB = "2_2";
+        String TS_2_3_INTAKE_OPEN = "2_3";
+
+        String TS_3_1_OUTTAKE_FLIP = "3_1";
+
+        if (TS_2_3_INTAKE_OPEN.equals(transferState)){
+            grabber.flipGrabberOut();
+            transferState = TS_3_1_OUTTAKE_FLIP;
+        }
+
+        if(TS_2_2_OUTTAKE_GRAB.equals(transferState) && elapsedTime > 0.5){
+            intake.openIntake();
+            transferState = TS_2_3_INTAKE_OPEN;
+        }
+
+        if (TS_2_1_INTAKE_UP.equals(transferState) && elapsedTime > 0.3){
+            grabber.closeGrabber();
+            transferState = TS_2_2_OUTTAKE_GRAB;
+        }
+
+        if (TS_1_1_OPEN_OUTTAKE.equals(transferState)){
+            intake.flipIntakeUp();
+            transferState = TS_2_1_INTAKE_UP;
+        }
+
+        if (TS_0_NOT_STARTED.equals(transferState)){
+            grabber.openGrabber();
+            transferState = TS_1_1_OPEN_OUTTAKE;
+        }
+
+        if(TS_3_1_OUTTAKE_FLIP.equalsIgnoreCase(transferState)){
+            transferState = TS_0_NOT_STARTED;
+            return false;
+        }
+
+        return true;
+    }
 
 
     @Override
@@ -61,50 +121,38 @@ public class FancyCancelableTeleop extends LinearOpMode {
         arm = hardwareStore.getArm();
         intake = hardwareStore.getIntake();
         grabber = hardwareStore.getGrabber();
-        scoringMechanism = hardwareStore.getScoringMechanism();
         drive = hardwareStore.getDrive();
         leftLimitSwitch = hardwareStore.leftLimitSwitch;
-
-        //grabber.grab();
+        rightLimitSwitch = hardwareStore.rightLimitSwitch;
 
         waitForStart();
-        //intake.flipIntakeDown();
+
         intake.rotateIntakeTo0();
 
-        boolean inGrabPosition = false;
-
         while (opModeIsActive()) {
+            /* Gamepad 1 Stuff */
             driveControl(drive);
 
-            if (gamepad1.b) {
-                intake.onPressRotate();
-            }
-            else {
-                intake.onReleaseRotate();
-            }
+            /* Gamepad 2 Stuff */
 
-            if (gamepad2.right_stick_y > 0.05) {
-                intake.extend();
-            }
-            else if (gamepad2.right_stick_y < 0.05) {
-                intake.retract();
-            }
+            intake.extend(gamepad2.right_stick_y);
 
+            /* Arm Controls - DPAD */
             if (gamepad2.dpad_up){
                 arm.lift(LIFT_SPEED);
             }
             else if (gamepad2.dpad_down){
-                arm.lower(LIFT_SPEED);
+                arm.lower(LOWER_SPEED);
             }
             else if (gamepad2.dpad_right) {
                 arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
             }
             else{
-                    arm.stop();
+                arm.stop();
             }
 
+            /* Intake Controls - LEFT TRIGGER/BUMPER */
             if (gamepad2.left_trigger > 0.2) {
-                intake.openIntake();
                 intake.onPressFlip();
             }
             else {
@@ -118,6 +166,14 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 intake.onReleaseIntake();
             }
 
+            /* Grabber/Outtake Controls - RIGHT TRIGGER/BUMPER */
+            if (gamepad2.right_trigger > 0.2) {
+                grabber.onPressFlip();
+            }
+            else {
+                grabber.onReleaseFlip();
+            }
+
             if (gamepad2.right_bumper) {
                 grabber.onPressGrabber();
             }
@@ -125,32 +181,21 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 grabber.onReleaseGrabber();
             }
 
-            if (gamepad2.right_trigger > .2) {
-                intake.openIntake();
-                intake.flipIntakeDown();
-            }
-
-
-            if (gamepad2.a) {
-                grabber.onPressFlip();
+            if (gamepad2.b) {
+                intake.onPressRotate();
             }
             else {
-                grabber.onReleaseFlip();
+                intake.onReleaseRotate();
             }
 
-            if (gamepad2.x && !inGrabPosition) {
-                inGrabPosition = true;
-                grabber.flipGrabberIn();
-                grabber.openGrabber();
-                //intake.flipIntakeUp();
-                arm.liftByEncoder(0, LIFT_SPEED);
-                //intake.retractByEncoder(EXTENSION_SPEED);
-                //sleep(300);
-                grabber.closeGrabber();
-                sleep(200);
-                intake.openIntake();
-                //intake.flipIntakeDown();
-                inGrabPosition = false;
+            if (gamepad2.x && !transferInProgress){
+                transferStartTime = getRuntime();
+                transferInProgress = true;
+            }
+
+            if (transferInProgress){
+                transferElapsedTime = getRuntime() - transferStartTime;
+                transferInProgress = transfer(transferElapsedTime);
             }
 
             if (gamepad2.y){
@@ -183,6 +228,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
             telemetry.addData("lift_left ", arm.liftLeft.getCurrentPosition());
             telemetry.addData("lift_right ", arm.liftRight.getCurrentPosition());
             telemetry.addData("l_limit_switch ", leftLimitSwitch.getValue());
+            telemetry.addData("r_limit_switch ", rightLimitSwitch.getValue());
             telemetry.update();
 
         }
@@ -190,8 +236,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
         telemetry.addData("MecanumDrivetrainTeleOp", "Stopping");
     }
 
-    private void driveControl(MecanumDrive drive)
-    {
+    private void driveControl(MecanumDrive drive) {
         Pose2d poseEstimate = drive.localizer.getPose();
         drive.updatePoseEstimate();
         Log.d("LOC", "x = " + poseEstimate.position.x +

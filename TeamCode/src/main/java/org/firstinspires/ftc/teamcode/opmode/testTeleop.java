@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.ScoringMechanism;
 
+import java.util.ArrayList;
+
 
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="testTeleop", group= "Linear Opmode")
 public class testTeleop extends LinearOpMode {
@@ -149,15 +151,27 @@ public class testTeleop extends LinearOpMode {
                 intake.flipIntakeMid();
             }
 
+            if (gamepad2.dpad_up) {
+                arm.lift(1.0);
+            }
+
+            else if (gamepad2.dpad_down) {
+                arm.lower(1.0);
+            }
+
+            else {
+                arm.stop();
+            }
+/*
             if (gamepad1.x && !transferInProgress){
                 transferStartTime = getRuntime();
                 transferInProgress = true;
             }
-
+/*
             if (transferInProgress){
                 transferElapsedTime = getRuntime() - transferStartTime;
                 transferInProgress = transfer(transferElapsedTime);
-            }
+            } */
 
             telemetry.addData("x", drive.localizer.getPose().position.x);
             telemetry.addData("y", drive.localizer.getPose().position.y);

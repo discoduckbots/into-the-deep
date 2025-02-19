@@ -32,6 +32,11 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(heading));
     }
 
+    /*protected TrajectoryActionBuilder buildSplineLinearTrajectory (double x, double y, double heading) {
+        return start.fresh()
+                .strafeToLinearHeading(new Vector2d(x, y), Math.toRadians(heading));
+    } */
+
     public class AutoArm {
         private Arm arm;
 

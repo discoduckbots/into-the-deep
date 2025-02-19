@@ -46,8 +46,8 @@ public class HardwareStore {
 
         liftRight = hardwareMap.get(DcMotorEx.class, "liftRight");
         liftRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftLimitSwitch = null;//hardwareMap.get(TouchSensor.class, "leftLimitSwitch");
-        rightLimitSwitch = null;//hardwareMap.get(TouchSensor.class, "rightLimitSwitch");
+        leftLimitSwitch = hardwareMap.get(TouchSensor.class, "leftLimitSwitch");
+        rightLimitSwitch = hardwareMap.get(TouchSensor.class, "rightLimitSwitch");
 
         arm = new Arm(liftLeft, liftRight, leftLimitSwitch, rightLimitSwitch);
 
@@ -63,10 +63,7 @@ public class HardwareStore {
 
         grabber = new Grabber(grabberServo, grabberFlip);
 
-        scoringMechanism = new ScoringMechanism(arm, grabber, intake);
-
         drive = new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0));
-//        autoDrive = new SparkFunOTOSDrive(hardwareMap, new Pose2d(0, 0, 0));
     }
 
     public Arm getArm() {
@@ -84,11 +81,4 @@ public class HardwareStore {
     public Grabber getGrabber(){
         return grabber;
     }
-    public ScoringMechanism getScoringMechanism() {
-        return scoringMechanism;
-    }
-
-    //    public SparkFunOTOSDrive getAutoDrive(){
-//        return autoDrive;
-//    }
 }
