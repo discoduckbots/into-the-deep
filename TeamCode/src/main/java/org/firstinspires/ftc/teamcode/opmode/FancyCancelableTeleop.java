@@ -35,8 +35,8 @@ public class FancyCancelableTeleop extends LinearOpMode {
     TouchSensor rightLimitSwitch = null;
     MecanumDrive drive = null;
 
-    private double THROTTLE = 0.7;
-    private double TURN_THROTTLE = 0.5;
+    private double THROTTLE = .595;
+    private double TURN_THROTTLE = 0.375;
     private double LIFT_SPEED = 0.9;
     private double LOWER_SPEED = 0.5;
     private double EXTENSION_SPEED = 0.7;
@@ -133,9 +133,43 @@ public class FancyCancelableTeleop extends LinearOpMode {
             /* Gamepad 1 Stuff */
             driveControl(drive);
 
+            if(gamepad1.dpad_up) {
+                intake.extend();
+            } else {
+                intake.retract();
+            }
+            if(gamepad1.a) {
+                intake.openIntake();
+                intake.flipIntakeWonky();
+            }
+
+            if (gamepad1.right_bumper) {
+                intake.onPressIntake();
+            }
+            else {
+                intake.onReleaseIntake();
+            }
+
+            if (gamepad1.y){
+                intake.flipIntakeDown();
+                sleep(250);
+                intake.closeIntake();
+                sleep(250);
+                intake.flipIntakeUp();
+            }
+            if (gamepad1.b) {
+                intake.onPressRotate();
+            }
+            else {
+                intake.onReleaseRotate();
+            }
+
+
+
+
             /* Gamepad 2 Stuff */
 
-            intake.extend(gamepad2.right_stick_y);
+            //intake.extend(gamepad2.right_stick_y);
 
             /* Arm Controls - DPAD */
             if (gamepad2.dpad_up){
@@ -159,12 +193,12 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 intake.onReleaseFlip();
             }
 
-            if (gamepad2.left_bumper) {
+            /*if (gamepad2.left_bumper) {
                 intake.onPressIntake();
             }
             else {
                 intake.onReleaseIntake();
-            }
+            } */
 
             /* Grabber/Outtake Controls - RIGHT TRIGGER/BUMPER */
             if (gamepad2.right_trigger > 0.2) {
@@ -181,11 +215,20 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 grabber.onReleaseGrabber();
             }
 
-            if (gamepad2.b) {
+            if (gamepad2.a) {
+                intake.openIntake();
+                intake.flipIntakeWonky();
+            }
+
+            /*if (gamepad2.b) {
                 intake.onPressRotate();
             }
             else {
                 intake.onReleaseRotate();
+            } */
+
+            if (gamepad2.dpad_left) {
+                intake.flipIntakeDown();
             }
 
             if (gamepad2.x && !transferInProgress){
@@ -253,19 +296,19 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 ));
 
                 drive.updatePoseEstimate();
-                if (gamepad1.dpad_up) {
+                if (gamepad2.left_bumper) {
                     lastPositionA = poseEstimate;
                     Log.d("LAST", "Setting last position to " + lastPositionA);
                 }
-                if (gamepad1.dpad_left) {
+                if (gamepad2.dpad_right) {
                     lastPositionB = poseEstimate;
                     Log.d("LAST", "Setting last position to " + lastPositionB);
                 }
-                if (gamepad1.dpad_down || gamepad1.dpad_right) {
+                if (gamepad1.left_bumper || gamepad1.dpad_right) {
                     if (!lastPositionPressed) {
                         lastPositionPressed = true;
                         Pose2d lastPosition = null;
-                        if (gamepad1.dpad_down) lastPosition = lastPositionA;
+                        if (gamepad1.dpad_left) lastPosition = lastPositionA;
                         else lastPosition = lastPositionB;
                         if (lastPosition != null) {
                             currentMode = Mode.AUTOMATIC_CONTROL;

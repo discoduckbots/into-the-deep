@@ -32,7 +32,7 @@ public class SampleAuto extends DuckbotAuto {
     private static final TranslationalVelConstraint SLOW_VEL = new TranslationalVelConstraint(15.0);
     private static final ProfileAccelConstraint SLOW_ACC = new ProfileAccelConstraint(-10, 10);
 
-    private TrajectoryActionBuilder cycleSample( //This is a method that is called to cycle a sample
+    private TrajectoryActionBuilder cycleSample(
             TrajectoryActionBuilder start, double rotatePos,
             double sampleX, double sampleY, double sampleHeading,
             double scoreX, double scoreY, double scoreHeading) {

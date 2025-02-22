@@ -125,6 +125,8 @@ public class testTeleop extends LinearOpMode {
                 intake.retract();
             }
 
+            intake.extend(gamepad2.right_stick_y);
+
             if (gamepad1.y){
                 grabber.flipGrabberIn();
             }
@@ -148,7 +150,7 @@ public class testTeleop extends LinearOpMode {
             }
 
             if (gamepad1.b){
-                intake.flipIntakeMid();
+                intake.openIntake();
             }
 
             if (gamepad2.dpad_up) {
@@ -161,6 +163,14 @@ public class testTeleop extends LinearOpMode {
 
             else {
                 arm.stop();
+            }
+
+            if (gamepad2.a) {
+                grabber.flipGrabberIn();
+            }
+
+            if (gamepad2.b) {
+                grabber.flipGrabberOut();
             }
 /*
             if (gamepad1.x && !transferInProgress){

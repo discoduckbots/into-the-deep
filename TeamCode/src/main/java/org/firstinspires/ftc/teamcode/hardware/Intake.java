@@ -4,11 +4,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private static final double INTAKE_OPEN_POS= 0;
-    private static final double INTAKE_CLOSE_POS = 0.14;
+    private static final double INTAKE_OPEN_POS= 0.0;
+    private static final double INTAKE_CLOSE_POS = 1.0; //0.14
     private static final double INTAKE_UP_POS = .7; //transfer
     private static final double INTAKE_DOWN_POS = 0.15; //grab block
     private static final double INTAKE_MID = 0.43; //camera view
+
+    private static final double INTAKE_WONKY = 0.285;
     private static final double INTAKE_ROTATE_90_POS = 1.0; //b
     private static final double INTAKE_ROTATE_0_POS = 0.0; //a
     public static final double EXTENSION_SERVO_OUT_POS = 0.0;
@@ -81,6 +83,10 @@ public class Intake {
     public void flipIntakeMid() {
         intakeFlip.setPosition(INTAKE_MID);
         isIntakeMid = true;
+    }
+
+    public void flipIntakeWonky() {
+        intakeFlip.setPosition(INTAKE_WONKY);
     }
 
     public void onPressFlip() {

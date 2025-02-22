@@ -112,15 +112,8 @@ public abstract class DuckbotAuto extends LinearOpMode {
                     initialized = true;
                     intake.closeIntake();
                 }
-
-                /*if (getRuntime()-startTime < INTAKE_TIME){
-                    return true;
-                }
-
-                intake.stop(); */
                 return  false;
             }
-
         }
 
         public class IntakeOpen implements Action {
@@ -169,7 +162,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    intake.flipIntakeMid();
+                    intake.flipIntakeWonky();
                 }
                 return  false;
             }
@@ -270,7 +263,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
                 if (!initialized) {
                     initialized = true;
                     resetRuntime();
-                    grabber.autoCloseGrabber();
+                    grabber.closeGrabber();
                 }
 
                 return false;
@@ -300,7 +293,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 if (!initialized) {
                     initialized = true;
-                    grabber.flipGrabberInAuto();
+                    grabber.flipGrabberIn();
                 }
                 return  false;
             }

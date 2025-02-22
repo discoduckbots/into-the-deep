@@ -34,14 +34,14 @@ public class RedObsvAuto extends DuckbotAuto {
         AutoGrabber grabber = new AutoGrabber(hardwareStore);
 
         drive = hardwareStore.getDrive();
-        teleGrabber = hardwareStore.getGrabber();
-        teleIntake = hardwareStore.getIntake();
+        //teleGrabber = hardwareStore.getGrabber();
+        //teleIntake = hardwareStore.getIntake();
 
         telemetry.addData(">", "Press Play to start op mode");
         telemetry.update();
-        teleGrabber.autoCloseGrabber();
-        teleIntake.rotateIntakeTo0();
-        teleGrabber.autoCloseGrabber();
+        //teleGrabber.autoCloseGrabber();
+        //teleIntake.rotateIntakeTo0();
+        //teleGrabber.autoCloseGrabber();
 
         TrajectoryActionBuilder deliverPreload = drive.actionBuilder(new Pose2d(0,0,0))
                 .strafeTo(new Vector2d(-20, -12.7)); // move to bar

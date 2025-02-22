@@ -2,6 +2,9 @@
 package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.ProfileAccelConstraint;
+import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
+import com.acmerobotics.roadrunner.TranslationalVelConstraint;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
@@ -17,7 +20,13 @@ public class MeepMeepTesting {
                 .build(); //our current values, 100, 125,
 
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-10, 58, Math.toRadians(90)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
+
+                .splineToLinearHeading(new Pose2d(41.7, 15.5, Math.toRadians(95)), Math.toRadians(90))
+                .strafeToConstantHeading(new Vector2d(41.7, 23))
+                .splineToLinearHeading(new Pose2d(3.5, 20, Math.toRadians(-41)), Math.toRadians(-45))
+
+                /*
                 .setTangent(Math.toRadians(-90))
                 .splineTo(new Vector2d(0,30), Math.toRadians(-90)) // drive to bar
                 .strafeTo(new Vector2d(0, 25)) // ram bar
@@ -31,7 +40,7 @@ public class MeepMeepTesting {
                 .splineToConstantHeading(new Vector2d(-55, 50), Math.toRadians(90))
                 .splineToConstantHeading(new Vector2d(-60, 10), Math.toRadians(180))
                 .splineToLinearHeading(new Pose2d(-65, 10, Math.toRadians(-90)), Math.toRadians(90))
-                .splineToConstantHeading(new Vector2d(-65, 50), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(-65, 50), Math.toRadians(90)) */
 
 
                 .build());
