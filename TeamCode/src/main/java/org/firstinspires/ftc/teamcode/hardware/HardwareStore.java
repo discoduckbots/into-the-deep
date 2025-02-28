@@ -10,6 +10,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvInternalCamera2Impl;
 
 public class HardwareStore {
     public DcMotorEx frontLeft ;
@@ -29,9 +31,9 @@ public class HardwareStore {
     public Servo grabberFlip;
     public TouchSensor leftLimitSwitch;
     public TouchSensor rightLimitSwitch;
-    public ScoringMechanism scoringMechanism;
 
     public MecanumDrive drive;
+
 
 //    public SparkFunOTOSDrive autoDrive;
 
@@ -81,4 +83,5 @@ public class HardwareStore {
     public Grabber getGrabber(){
         return grabber;
     }
+
 }

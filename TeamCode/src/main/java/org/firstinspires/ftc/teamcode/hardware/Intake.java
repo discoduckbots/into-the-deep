@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class Intake {
 
-    private static final double INTAKE_OPEN_POS= 0.0;
+    private static final double INTAKE_OPEN_POS= 0.1;
     private static final double INTAKE_CLOSE_POS = 1.0; //0.14
     private static final double INTAKE_UP_POS = .7; //transfer
     private static final double INTAKE_DOWN_POS = 0.15; //grab block

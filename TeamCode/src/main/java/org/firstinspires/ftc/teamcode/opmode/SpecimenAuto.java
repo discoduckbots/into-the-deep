@@ -26,9 +26,10 @@ public class SpecimenAuto extends DuckbotAuto {
     Grabber teleGrabber = null;
     Intake teleIntake = null;
 
-    private static final TranslationalVelConstraint SLOW_VEL= new TranslationalVelConstraint(60);
-    private static final ProfileAccelConstraint SLOW_ACC = new ProfileAccelConstraint(-30, 60);
-
+    private static final TranslationalVelConstraint SLOW_VEL= new TranslationalVelConstraint(50);
+    private static final ProfileAccelConstraint SLOW_ACC = new ProfileAccelConstraint(-30, 30);
+    private static final TranslationalVelConstraint MED_VEL= new TranslationalVelConstraint(75);
+    private static final ProfileAccelConstraint MED_ACC = new ProfileAccelConstraint(-30, 50);
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -48,46 +49,69 @@ public class SpecimenAuto extends DuckbotAuto {
 
 
 
-        TrajectoryActionBuilder driveToBarPreload = drive.actionBuilder(new Pose2d(0,0,0))
-                .strafeTo(new Vector2d(27, 17)); // move to bar
-
-        TrajectoryActionBuilder scorePreload = driveToBarPreload.endTrajectory().fresh()
-                .strafeTo(new Vector2d(30, 17));
-
+        TrajectoryActionBuilder scorePreload = drive.actionBuilder(new Pose2d(0,0,0))
+                .strafeTo(new Vector2d(34, 17)); // move to bar
+        /*
         TrajectoryActionBuilder pushFirstSample = scorePreload.endTrajectory().fresh()
                 .setTangent(180)
-                .splineToConstantHeading(new Vector2d(22, -15), Math.toRadians(-90)) //back up from bar
-                .splineToConstantHeading(new Vector2d(50, -38), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to first sample
-                .splineToConstantHeading(new Vector2d(15, -38), Math.toRadians(0), SLOW_VEL, SLOW_ACC); //first move to wall
+                .splineToConstantHeading(new Vector2d(31, -25.5), Math.toRadians(0)) // x was 30
+                //.splineToConstantHeading(new Vector2d(22, -18), Math.toRadians(0)) //back up from bar
+                .splineToConstantHeading(new Vector2d(56, -34), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to first sample
+                .splineToConstantHeading(new Vector2d(18, -34), Math.toRadians(0), SLOW_VEL, SLOW_ACC); //first move to wall
 
         TrajectoryActionBuilder pushSecondSample = pushFirstSample.endTrajectory().fresh()
-                .splineToConstantHeading(new Vector2d(50, -44.5), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to second sample
-                .splineToConstantHeading(new Vector2d(15, -46.5), Math.toRadians(0), SLOW_VEL, SLOW_ACC); //second move to wall
+                .splineToConstantHeading(new Vector2d(46, -39.5), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to second sample
+                .splineToConstantHeading(new Vector2d(15, -39), Math.toRadians(0), SLOW_VEL, SLOW_ACC); //second move to wall
 
         TrajectoryActionBuilder pushThirdSample = pushSecondSample.endTrajectory().fresh()
-                .splineToConstantHeading(new Vector2d(50, -52), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to third sample
-                .splineToConstantHeading(new Vector2d(15, -52), Math.toRadians(0), SLOW_VEL, SLOW_ACC); //third move to wall, radians was 90
+                .splineToConstantHeading(new Vector2d(48, -49), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to third sample
+                .splineToConstantHeading(new Vector2d(8, -48.5), Math.toRadians(-90)); //third move to wall */
 
-        TrajectoryActionBuilder grabFirstSpecimen = pushThirdSample.endTrajectory().fresh()
-                .splineToConstantHeading(new Vector2d(15, -30), Math.toRadians(180))
-                .strafeTo(new Vector2d(.75, -26));
+        TrajectoryActionBuilder transferFirstSample = scorePreload.endTrajectory().fresh()
+                .setTangent(Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(14.5, -42, 0), Math.toRadians(-90), MED_VEL, MED_ACC);
 
-        TrajectoryActionBuilder scoreFirstSpecimen = grabFirstSpecimen.endTrajectory().fresh()
+        TrajectoryActionBuilder transferSecondSample = transferFirstSample.endTrajectory().fresh()
+                .strafeToLinearHeading(new Vector2d(14.5, -50), Math.toRadians(0), MED_VEL, MED_ACC);
+
+        /*TrajectoryActionBuilder pushThirdSample = transferSecondSample.endTrajectory().fresh()
                 .setTangent(0)
-                .splineToConstantHeading(new Vector2d(28, 10), 0)
-                .strafeTo(new Vector2d(33, 15.5));
+                .splineToConstantHeading(new Vector2d(48, -52), Math.toRadians(180), SLOW_VEL, SLOW_ACC) //move to third sample
+                .splineToConstantHeading(new Vector2d(8, -52), Math.toRadians(-90)); //third move to wall */
 
-        TrajectoryActionBuilder secondBackUpLittle = scoreFirstSpecimen.endTrajectory().fresh()
-                .splineToConstantHeading(new Vector2d(22, -15), Math.toRadians(-90));
+        TrajectoryActionBuilder grabFirstSpecimen = transferSecondSample.endTrajectory().fresh()
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-2, -28, Math.toRadians(0)), Math.toRadians(90));
 
-        TrajectoryActionBuilder grabSecondSpecimen = secondBackUpLittle.endTrajectory().fresh()
-                .splineToConstantHeading(new Vector2d(15, -30), Math.toRadians(180))
-                .strafeTo(new Vector2d(.2, -26));
-
-        TrajectoryActionBuilder scoreSecondSpecimen = grabSecondSpecimen.endTrajectory().fresh()
+        TrajectoryActionBuilder scoreFirstSpecimen = drive.actionBuilder(new Pose2d(0,0, 0))
                 .setTangent(0)
-                .splineToConstantHeading(new Vector2d(28, 5.8), Math.toRadians(45))
-                .strafeTo(new Vector2d(35, 12));
+                .splineToConstantHeading(new Vector2d(30,41), Math.toRadians(0))
+                .strafeTo(new Vector2d(35.5, 41));
+
+        TrajectoryActionBuilder grabSecondSpecimen = scoreFirstSpecimen.endTrajectory().fresh()
+                .setTangent(Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(30, 41), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-2, 0, Math.toRadians(0)), Math.toRadians(90));
+
+        TrajectoryActionBuilder scoreSecondSpecimen = drive.actionBuilder(new Pose2d(0,0, 0))
+                .setTangent(90)
+                .splineToConstantHeading(new Vector2d(22,44), Math.toRadians(0))
+                .strafeTo(new Vector2d(35.5, 44));
+
+        TrajectoryActionBuilder grabThirdSpecimen = scoreSecondSpecimen.endTrajectory().fresh()
+                .setTangent(180)
+                .splineToConstantHeading(new Vector2d(30, 44), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-1, 0), Math.toRadians(0));
+
+        TrajectoryActionBuilder scoreThirdSpecimen = drive.actionBuilder(new Pose2d(0,0, 0))
+                .setTangent(90)
+                .splineToConstantHeading(new Vector2d(24, 39), Math.toRadians(0))
+                .strafeTo(new Vector2d(35.5, 39));
+
+        TrajectoryActionBuilder parkInObservation = scoreThirdSpecimen.endTrajectory().fresh()
+                .setTangent(180)
+                .splineToConstantHeading(new Vector2d(30, 39), Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(3, 0), Math.toRadians(0));
 
 
         telemetry.addData("ready to start", "");
@@ -109,92 +133,209 @@ public class SpecimenAuto extends DuckbotAuto {
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
-                                    driveToBarPreload.build(),
-                                    arm.liftToTargetPosition(Arm.LIFT_BELOW_BAR)
-                            ),
-                            new ParallelAction(
                                     scorePreload.build(),
-                                    arm.liftToTargetPosition(Arm.LIFT_ABOVE_BAR)
-                                    ),
-                            new SleepAction(0.5),
+                                    arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN)
+                            ),
+                            grabber.grabberMiddle(),
+                            new SleepAction(0.3),
                             grabber.grabberRelease(),
                             new SleepAction(0.2)
                     )
             );
 
-/*
+            //transfer first sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberIn(),
+                            new ParallelAction(
+                                    transferFirstSample.build(),
+                                    arm.liftToTargetPosition(0)
+                            ),
+                            intake.extend(0.93),
+                            grabber.grabberRelease(),
+                            intake.intakeDown(),
+                            new SleepAction(0.6),
+                            intake.intakeClose(),
+                            new SleepAction(0.5),
+                            new ParallelAction(
+                                    intake.intakeUp(),
+                                    intake.retract()
+                            ),
+                            new SleepAction(0.5),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.2),
+                            intake.intakeOpen(),
+                            grabber.grabberOut(),
+                            new SleepAction(0.8),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
+                    )
+            );
 
+            //transfer second sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    grabber.grabberIn(),
+                                    transferSecondSample.build(),
+                                    intake.extend(0.93)
+                                    ),
+                            intake.intakeDown(),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.5),
+                            intake.intakeClose(),
+                            new SleepAction(0.5),
+                            new ParallelAction(
+                                    intake.intakeUp(),
+                                    intake.retract()
+                            ),
+                            new SleepAction(0.5),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.2),
+                            intake.intakeOpen(),
+                            grabber.grabberOut(),
+                            new SleepAction(0.8),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
+                    )
+            );
+/*
+            // push third sample
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    intake.retract(),
+                                    grabber.grabberRelease(),
+                                    pushThirdSample.build()
+                            )
+                    )
+            ); /*
+/*
             // push samples
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
-                                    arm.liftToTargetPosition(12),
+                                    intake.retract(),
+                                    arm.liftToTargetPosition(Arm.LIFT_GRAB_FROM_WALL),
                                     pushFirstSample.build()
                             ),
                             new ParallelAction(
                                     grabber.grabberOut(),
                                     pushSecondSample.build()
                             ),
+                            new SleepAction(.2),
                             new ParallelAction(
+                                    intake.retract(),
                                     grabber.grabberRelease(),
                                     pushThirdSample.build()
                             )
+                    )
+            ); */
 
+            // grab first specimen
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabFirstSpecimen.build(),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.3)
                     )
             );
+            drive.localizer.setPose(new Pose2d(0, 0, 0));
+
             //score first specimen
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
-                                    grabFirstSpecimen.build()
-                            ),
-                            grabber.grabberGrab(),
-                            new SleepAction(0.3),
-                            new ParallelAction(
                                     scoreFirstSpecimen.build(),
-                                    arm.liftToTargetPosition(Arm.LIFT_BELOW_BAR),
+                                    arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN -20),
                                     grabber.grabberIn()
                             ),
-                            new SleepAction(.35),
-                            arm.liftToTargetPosition(Arm.LIFT_EXTRA_ABOVE),
-                            new SleepAction(1),
+                            grabber.grabberMiddle(),
+                            new SleepAction(0.3),
                             grabber.grabberRelease(),
                             new SleepAction(0.2)
                     )
-
             );
 
-            //grab and score second specimen
+            //grab second specimen
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberOut(),
+                            new ParallelAction(
+                                    grabSecondSpecimen.build(),
+                                    arm.liftToTargetPosition(0),
+                                    grabber.grabberRelease()
+                            ),
+                            new SleepAction(0.2),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.3)
+                    )
+            );
+
+            drive.localizer.setPose(new Pose2d(0, 0, 0));
+
+            //score second specimen
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
-                                    grabber.grabberGrab(),
-                                    new SleepAction(.35),
-                                    grabber.grabberOut(),
-                                    secondBackUpLittle.build(),
-                                    arm.liftToTargetPosition(12)
-                            ),
-                            new ParallelAction(
-                                    grabSecondSpecimen.build(), //spline to grab wall pos
-                                    grabber.grabberRelease()
-                            ),
-                            grabber.grabberGrab(),
-                            new SleepAction(0.3),
-                            new ParallelAction(
                                     scoreSecondSpecimen.build(),
-                                    arm.liftToTargetPosition(Arm.LIFT_BELOW_BAR),
+                                    arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN -20),
                                     grabber.grabberIn()
                             ),
-                            arm.liftToTargetPosition(Arm.LIFT_ABOVE_BAR),
-                            new SleepAction(0.65),
+                            grabber.grabberMiddle(),
+                            new SleepAction(0.3),
                             grabber.grabberRelease(),
                             new SleepAction(0.2)
                     )
+            );
 
-            ); */
+            //grab third specimen
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberOut(),
+                            new ParallelAction(
+                                    grabThirdSpecimen.build(),
+                                    arm.liftToTargetPosition(0),
+                                    grabber.grabberRelease()
+                            ),
+                            new SleepAction(0.2),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.3)
+                    )
+            );
 
+            drive.localizer.setPose(new Pose2d(0, 0, 0));
 
+            //score third specimen
+            Actions.runBlocking(
+                    new SequentialAction(
+                            new ParallelAction(
+                                    scoreThirdSpecimen.build(),
+                                    arm.liftToTargetPosition(Arm.LIFT_PLACE_SPECIMEN -20),
+                                    grabber.grabberIn()
+                            ),
+                            grabber.grabberMiddle(),
+                            new SleepAction(0.3),
+                            grabber.grabberRelease(),
+                            new SleepAction(0.2)
+                    )
+            );
 
-         }
+            //park
+            Actions.runBlocking(
+                    new SequentialAction(
+                            grabber.grabberOut(),
+                            new ParallelAction(
+                                    parkInObservation.build(),
+                                    arm.liftToTargetPosition(0),
+                                    grabber.grabberRelease()
+                            ),
+                            new SleepAction(0.2),
+                            grabber.grabberGrab(),
+                            new SleepAction(0.3)
+                    )
+            );
+
+        }
     }
 }

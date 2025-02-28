@@ -53,36 +53,36 @@ public class SplineSampleAuto extends DuckbotAuto {
         Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(0));
 
         TrajectoryActionBuilder scorePreload = drive.actionBuilder(initialPose)
-                .strafeToLinearHeading(new Vector2d(3.5, 18.5), Math.toRadians(-41));
+                .strafeToLinearHeading(new Vector2d(5.17, 23.09), Math.toRadians(-45));
 
         TrajectoryActionBuilder grabFirstSample = scorePreload.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(16, 11.75, Math.toRadians(0)), Math.toRadians(180), SLOW_VEL, SLOW_ACC);
+                .splineToLinearHeading(new Pose2d(11.5, 10, Math.toRadians(0)), Math.toRadians(180), SLOW_VEL, SLOW_ACC);
                 //.strafeTo(new Vector2d(0, 0));
 
         TrajectoryActionBuilder scoreFirstSample = grabFirstSample.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(4, 18.5, Math.toRadians(-41)), Math.toRadians(-45));
+                .splineToLinearHeading(new Pose2d(4.5, 20, Math.toRadians(-45)), Math.toRadians(-45));
 
         TrajectoryActionBuilder grabSecondSample = scoreFirstSample.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(14.7, 26.85, Math.toRadians(0)), Math.toRadians(180), SLOW_VEL, SLOW_ACC);
+                .splineToLinearHeading(new Pose2d(11.9, 25.2, Math.toRadians(0)), Math.toRadians(180), SLOW_VEL, SLOW_ACC);
                 //.strafeTo(new Vector2d(0, 0));
 
         TrajectoryActionBuilder scoreSecondSample = grabSecondSample.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(3, 19.5, Math.toRadians(-41)), Math.toRadians(-45));
+                .splineToLinearHeading(new Pose2d(4, 21.5, Math.toRadians(-45)), Math.toRadians(-45));
 
         TrajectoryActionBuilder moveToThirdSample = scoreSecondSample.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(41.7, 15.5, Math.toRadians(90)), Math.toRadians(90));
+                .splineToLinearHeading(new Pose2d(37.7, 15.5, Math.toRadians(90)), Math.toRadians(90));
 
         TrajectoryActionBuilder grabThirdSample = moveToThirdSample.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(40, 22), SLOW_VEL, SLOW_ACC);
+                .strafeToConstantHeading(new Vector2d(36, 22), SLOW_VEL, SLOW_ACC);
 
-        TrajectoryActionBuilder moregrabThirdSample = grabThirdSample.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(40, 26.5), SLOW_VEL, SLOW_ACC);
+        /*TrajectoryActionBuilder moregrabThirdSample = grabThirdSample.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(36, 26.5), SLOW_VEL, SLOW_ACC);
+*/
+        TrajectoryActionBuilder lessgrabThirdSample = grabThirdSample.endTrajectory().fresh()
+                .strafeToConstantHeading(new Vector2d(36, 17), SLOW_VEL, SLOW_ACC);
 
-        TrajectoryActionBuilder lessgrabThirdSample = moregrabThirdSample.endTrajectory().fresh()
-                .strafeToConstantHeading(new Vector2d(40, 20.5), SLOW_VEL, SLOW_ACC);
-
-        TrajectoryActionBuilder scoreThirdSample = grabThirdSample.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(9, 20, Math.toRadians(-41)), Math.toRadians(-45));
+        TrajectoryActionBuilder scoreThirdSample = lessgrabThirdSample.endTrajectory().fresh()
+                .splineToLinearHeading(new Pose2d(4, 24, Math.toRadians(-45)), Math.toRadians(-45));
 
 
 
@@ -127,7 +127,7 @@ public class SplineSampleAuto extends DuckbotAuto {
                             new ParallelAction(
                                     grabFirstSample.build(),
                                     arm.liftToTargetPosition(0),
-                                    intake.extend()
+                                    intake.extend(1.0)
                             ),
                             intake.intakeDown(),
                             grabber.grabberRelease(),
@@ -151,11 +151,11 @@ public class SplineSampleAuto extends DuckbotAuto {
                                    scoreFirstSample.build(),
                                    new SequentialAction (
                                            intake.intakeOpen(),
-                                           arm.liftToTargetPosition(Arm.LIFT_BASKET_LOWER)
+                                           arm.liftToTargetPosition(Arm.LIFT_BASKET)
                                    )
                            ),
-                           grabber.grabberMiddle(),
-                           new SleepAction(0.5),
+                           grabber.grabberOut(),
+                           new SleepAction(1),
                            grabber.grabberRelease(),
                            new SleepAction(0.5)
                    )
@@ -168,7 +168,7 @@ public class SplineSampleAuto extends DuckbotAuto {
                             new ParallelAction(
                                     grabSecondSample.build(),
                                     arm.liftToTargetPosition(0),
-                                    intake.extend()
+                                    intake.extend(1.0)
                             ),
                             intake.intakeDown(),
                             grabber.grabberRelease(),
@@ -192,10 +192,10 @@ public class SplineSampleAuto extends DuckbotAuto {
                                     scoreSecondSample.build(),
                                     new SequentialAction (
                                             intake.intakeOpen(),
-                                            arm.liftToTargetPosition(Arm.LIFT_BASKET_LOWER)
+                                            arm.liftToTargetPosition(Arm.LIFT_BASKET)
                                     )
                             ),
-                            grabber.grabberMiddle(),
+                            grabber.grabberOut(),
                             new SleepAction(0.5),
                             grabber.grabberRelease(),
                             new SleepAction(0.5)
@@ -210,19 +210,15 @@ public class SplineSampleAuto extends DuckbotAuto {
                                     moveToThirdSample.build(),
                                     arm.liftToTargetPosition(0),
                                     intake.intakeRotate(1.0), //rotate90
-                                    intake.intakeMid() //intakeWonky
+                                    intake.intakeDown() //intakeWonky
                             ),
                             grabThirdSample.build(),
                             new SleepAction(0.5),
-                            intake.intakeDown(),
                             grabber.grabberRelease(),
-                            new SleepAction(0.8),
-                            moregrabThirdSample.build(),
-                            new SleepAction(.3),
                             intake.intakeClose(),
-                            new SleepAction(0.8),
+                            new SleepAction(.5),
                             lessgrabThirdSample.build(),
-                            new SleepAction(.7),
+                            new SleepAction(.2),
                             new ParallelAction(
                                     intake.intakeUp(),
                                     intake.intakeRotate(0.0)
@@ -240,11 +236,11 @@ public class SplineSampleAuto extends DuckbotAuto {
                                     scoreThirdSample.build(),
                                     new SequentialAction (
                                             intake.intakeOpen(),
-                                            arm.liftToTargetPosition(Arm.LIFT_BASKET_LOWER)
+                                            arm.liftToTargetPosition(Arm.LIFT_BASKET)
                                     )
                             ),
-                            grabber.grabberMiddle(),
-                            new SleepAction(0.5),
+                            grabber.grabberOut(),
+                            new SleepAction(0.8),
                             grabber.grabberRelease(),
                             new SleepAction(0.8),
                             arm.liftToTargetPosition(0)

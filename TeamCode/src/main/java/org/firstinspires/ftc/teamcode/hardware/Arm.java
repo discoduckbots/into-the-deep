@@ -17,10 +17,9 @@ public class Arm {
 
     public static final int LIFT_BASKET_LOWER = 1000;
     public static final int LIFT_PLACE_PRELOAD_SPECIMEN = 1980;
-    public static final int LIFT_PLACE_SPECIMEN = 1920;
-    public static final int LIFT_GRAB_FROM_WALL = 200;
+    public static final int LIFT_PLACE_SPECIMEN = 237;
+    public static final int LIFT_GRAB_FROM_WALL = 0;
     public static final int LIFT_ABOVE_BAR = 630;
-
     public static final int LIFT_EXTRA_ABOVE = 680;
     public static final int LIFT_BELOW_BAR = 400;
 

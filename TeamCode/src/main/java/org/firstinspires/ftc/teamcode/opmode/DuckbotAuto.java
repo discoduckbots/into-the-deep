@@ -169,17 +169,24 @@ public abstract class DuckbotAuto extends LinearOpMode {
         }
 
         public class Extend implements Action {
-
-
             private boolean initialized = false;
+            private double targetPosition = 0;
+
+            public Extend(double targetPosition){
+                super();
+                this.targetPosition = targetPosition;
+            }
 
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                if (!initialized) {
+                if (!initialized){
+                    intake.extend(targetPosition);
                     initialized = true;
-                    resetRuntime();
-                    intake.extend();
                 }
+
+//                if (arm.getLiftPos() != targetPosition){
+//                    return true;
+//                }
 
                 return false;
             }
@@ -237,10 +244,7 @@ public abstract class DuckbotAuto extends LinearOpMode {
         }
         public Action intakeDown(){return new IntakeDown();}
         public Action intakeMid(){return new IntakeMid();}
-        public Action extend(){
-            return new Extend();
-        }
-
+        public Action extend(double targetPosition) {return new Extend(targetPosition);}
         public Action retract(){
             return new Retract();
         }

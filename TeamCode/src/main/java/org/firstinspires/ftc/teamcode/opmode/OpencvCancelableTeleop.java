@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,12 +20,11 @@ import org.firstinspires.ftc.teamcode.hardware.Grabber;
 import org.firstinspires.ftc.teamcode.hardware.HardwareStore;
 import org.firstinspires.ftc.teamcode.hardware.Intake;
 import org.firstinspires.ftc.teamcode.hardware.SampleDetector;
-import org.firstinspires.ftc.teamcode.hardware.ScoringMechanism;
 import org.openftc.easyopencv.OpenCvCamera;
 
-
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="Fancy Cancelable Teleop", group= "Competition Opmodes")
-public class FancyCancelableTeleop extends LinearOpMode {
+@Disabled
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="OpenCv Test Op Mode", group= "Linear Opmode")
+public class OpencvCancelableTeleop extends LinearOpMode {
     enum Mode {
         DRIVER_CONTROL,
         AUTOMATIC_CONTROL
@@ -37,16 +37,20 @@ public class FancyCancelableTeleop extends LinearOpMode {
     TouchSensor leftLimitSwitch = null;
     TouchSensor rightLimitSwitch = null;
     MecanumDrive drive = null;
+    OpenCvCamera webcam = null;
     SampleDetector sampleDetector = null;
 
-    private double THROTTLE = .8;
-    private double TURN_THROTTLE = 0.7;
+    private double THROTTLE = .595;
+    private double TURN_THROTTLE = 0.375;
     private double LIFT_SPEED = 0.9;
     private double LOWER_SPEED = 0.5;
+    private double EXTENSION_SPEED = 0.7;
+    //private MotorOffset motorOffset = new MotorOffset();
     private boolean inGrabPosition = false;
     boolean minute = false;
     boolean endgame = false;
     boolean tenSec = false;
+    boolean rumbling = false;
     boolean transferInProgress = false;
     double transferStartTime = 0;
     double transferElapsedTime;
@@ -56,11 +60,11 @@ public class FancyCancelableTeleop extends LinearOpMode {
     boolean lastPositionPressed = false;
     Action moveToLastPosAction = null;
     String transferState = "0";
-    private MotorOffset motorOffset = new MotorOffset();
 
-    public class MotorOffset {
+    private class MotorOffset {
         public double x_offset = 0;
         public double y_offset = 0;
+
         public boolean detected = false;
     }
 
@@ -133,7 +137,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
         drive = hardwareStore.getDrive();
         leftLimitSwitch = hardwareStore.leftLimitSwitch;
         rightLimitSwitch = hardwareStore.rightLimitSwitch;
-        sampleDetector = new SampleDetector(hardwareMap.get(WebcamName.class, "webcam"), hardwareMap, motorOffset, gamepad1);
+        //sampleDetector = new SampleDetector(hardwareMap.get(WebcamName.class, "webcam"), hardwareMap, motorOffset, gamepad1);
 
         waitForStart();
 
@@ -143,24 +147,14 @@ public class FancyCancelableTeleop extends LinearOpMode {
             /* Gamepad 1 Stuff */
             driveControl(drive);
 
-            if (gamepad1.left_bumper) {
-                intake.flipIntakeMid();
-                sampleDetector.startDetecting();
-            }
-            else {
-                motorOffset.x_offset = 0;
-                motorOffset.y_offset = 0;
-                sampleDetector.stopDetecting();
-            }
-
             if(gamepad1.dpad_up) {
                 intake.extend();
-            } else {
+            } else if (gamepad1.dpad_down){ //remove else if later
                 intake.retract();
             }
             if(gamepad1.a) {
                 intake.openIntake();
-                intake.flipIntakeDown();
+                intake.flipIntakeWonky();
             }
 
             if (gamepad1.right_bumper) {
@@ -174,7 +168,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 intake.flipIntakeDown();
                 sleep(250);
                 intake.closeIntake();
-                sleep(327);
+                sleep(250);
                 intake.flipIntakeUp();
             }
             if (gamepad1.b) {
@@ -183,11 +177,27 @@ public class FancyCancelableTeleop extends LinearOpMode {
             else {
                 intake.onReleaseRotate();
             }
+/*
+            if (gamepad1.left_bumper) {
+                sampleDetector.startDetecting();
+            }
+            else {
+                motorOffset.x_offset = 0;
+                motorOffset.y_offset = 0;
+                sampleDetector.stopDetecting();
+            } */
+
+            if (gamepad1.x) {
+                intake.flipIntakeMid();
+                intake.closeIntake();
+            }
 
 
 
 
             /* Gamepad 2 Stuff */
+
+            //intake.extend(gamepad2.right_stick_y);
 
             /* Arm Controls - DPAD */
             if (gamepad2.dpad_up){
@@ -197,12 +207,8 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 arm.lower(LOWER_SPEED);
             }
             else if (gamepad2.dpad_right) {
-                arm.liftByEncoder(Arm.LIFT_PLACE_SPECIMEN, LIFT_SPEED);
+                arm.liftByEncoder(Arm.LIFT_BELOW_BAR, LIFT_SPEED);
             }
-            else if (gamepad2.dpad_left) {
-                arm.liftByEncoder(Arm.LIFT_BASKET, LIFT_SPEED);
-            }
-
             else{
                 arm.stop();
             }
@@ -215,16 +221,19 @@ public class FancyCancelableTeleop extends LinearOpMode {
                 intake.onReleaseFlip();
             }
 
+            /*if (gamepad2.left_bumper) {
+                intake.onPressIntake();
+            }
+            else {
+                intake.onReleaseIntake();
+            } */
+
             /* Grabber/Outtake Controls - RIGHT TRIGGER/BUMPER */
             if (gamepad2.right_trigger > 0.2) {
                 grabber.onPressFlip();
             }
             else {
                 grabber.onReleaseFlip();
-            }
-
-            if (gamepad2.b) {
-                grabber.flipGrabberMiddle();
             }
 
             if (gamepad2.right_bumper) {
@@ -237,6 +246,17 @@ public class FancyCancelableTeleop extends LinearOpMode {
             if (gamepad2.a) {
                 intake.openIntake();
                 intake.flipIntakeWonky();
+            }
+
+            /*if (gamepad2.b) {
+                intake.onPressRotate();
+            }
+            else {
+                intake.onReleaseRotate();
+            } */
+
+            if (gamepad2.dpad_left) {
+                intake.flipIntakeDown();
             }
 
             if (gamepad2.x && !transferInProgress){
@@ -258,15 +278,15 @@ public class FancyCancelableTeleop extends LinearOpMode {
             }
 
             if (runtime.time() >= 60 && !minute) {
-                gamepad2.rumbleBlips(2);
+                gamepad1.rumbleBlips(2);
                 minute = true;
             }
             if (runtime.time() >= 90 && !endgame) {
-                gamepad2.rumbleBlips(3);
+                gamepad1.rumbleBlips(3);
                 endgame = true;
             }
             if (runtime.time() >= 110 && !tenSec) {
-                gamepad2.rumbleBlips(5);
+                gamepad1.rumbleBlips(5);
                 tenSec = true;
             }
 
@@ -297,14 +317,14 @@ public class FancyCancelableTeleop extends LinearOpMode {
             case DRIVER_CONTROL:
                 drive.setDrivePowers(new PoseVelocity2d(
                         new Vector2d(
-                                -gamepad1.left_stick_y + motorOffset.y_offset * THROTTLE,
-                                -gamepad1.left_stick_x + motorOffset.x_offset * THROTTLE
+                                (-gamepad1.left_stick_y) * THROTTLE,
+                                (-gamepad1.left_stick_x) * THROTTLE
                         ),
                         -gamepad1.right_stick_x * TURN_THROTTLE
                 ));
 
                 drive.updatePoseEstimate();
-                if (gamepad2.left_bumper) {
+                if (gamepad2.left_trigger > 0.5) {
                     lastPositionA = poseEstimate;
                     Log.d("LAST", "Setting last position to " + lastPositionA);
                 }
@@ -316,7 +336,7 @@ public class FancyCancelableTeleop extends LinearOpMode {
                     if (!lastPositionPressed) {
                         lastPositionPressed = true;
                         Pose2d lastPosition = null;
-                        if (gamepad1.left_trigger > 0.5) lastPosition = lastPositionA;
+                        if (gamepad1.dpad_left) lastPosition = lastPositionA;
                         else lastPosition = lastPositionB;
                         if (lastPosition != null) {
                             currentMode = Mode.AUTOMATIC_CONTROL;

@@ -22,9 +22,11 @@ public class MeepMeepTesting {
 
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, Math.toRadians(0)))
 
-                .splineToLinearHeading(new Pose2d(41.7, 15.5, Math.toRadians(95)), Math.toRadians(90))
-                .strafeToConstantHeading(new Vector2d(41.7, 23))
-                .splineToLinearHeading(new Pose2d(3.5, 20, Math.toRadians(-41)), Math.toRadians(-45))
+                //.strafeTo(new Vector2d(34, 15))
+                .setTangent(180)
+                .splineToConstantHeading(new Vector2d(32.5, -26), Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(52, -38), Math.toRadians(180)) //move to first sample
+                .splineToConstantHeading(new Vector2d(20, -40), Math.toRadians(0)) //first move to wall
 
                 /*
                 .setTangent(Math.toRadians(-90))
